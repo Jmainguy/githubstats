@@ -62,7 +62,7 @@ func listRepos(client *githubv4.Client, organization string) (repos []repo) {
 	var reposQuery struct {
 		Organization struct {
 			Name         githubv4.String
-			Url          githubv4.String
+			URL          githubv4.String
 			Repositories struct {
 				Edges []struct {
 					Node struct {
