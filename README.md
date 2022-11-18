@@ -5,6 +5,15 @@
 
 A golang application to return stats from github via their graphql endpoint
 
+## Requirements
+This tool requires a github personal access token to work, the token needs to repo permissions.
+
+You need to export the token before running the tool, it has to be named GITHUB_TOKEN
+
+```/bin/bash
+export GITHUB_TOKEN=ghp_sdasdasdewsadsdad2asdsadasdas
+```
+
 ## Usage
 ```/bin/bash
 Usage of githubstats:
@@ -20,10 +29,11 @@ Usage of githubstats:
 
 ## Example
 ```/bin/bash
+[jmainguy@jmainguy githubstats]$ export GITHUB_TOKEN=ghp_sdasdasdewsadsdad2asdsadasdas
 [jmainguy@jmainguy githubstats]$ githubstats 
-Total PR's Opened 0
-Total PR's Merged 0
-Total Reviews 0
+Total PR's Opened 7
+Total PR's Merged 5
+Total Reviews 3
 ```
 
 ## PreBuilt Binaries
