@@ -7,7 +7,23 @@ A golang application to return stats from github via their graphql endpoint
 
 ## Usage
 ```/bin/bash
---USAGE--
+Usage of githubstats:
+  -orgs string
+    	a list of orgs separated by commas (default "standouthost")
+  -since string
+    	yyyy-mm-dd date to check for stats since (default "2022-01-01")
+  -user string
+    	Github Username (default "Jmainguy")
+  -verbose
+    	print verbose information about each contribution or not
+```
+
+## Example
+```/bin/bash
+[jmainguy@jmainguy githubstats]$ githubstats 
+Total PR's Opened 0
+Total PR's Merged 0
+Total Reviews 0
 ```
 
 ## PreBuilt Binaries
