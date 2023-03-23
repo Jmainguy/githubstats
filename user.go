@@ -132,3 +132,30 @@ func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullR
 	}
 	return pullRequestReviews
 }
+
+func commitsByUser(client *githubv4.Client, user, date string) (commits int) {
+	var userQuery struct {
+		User struct {
+			ContributionsCollection struct {
+				TotalCommitContributions githubv4.Int
+			} `graphql:"contributionsCollection(from: $since)"`
+		} `graphql:"user(login: $login)"`
+	}
+	const layout = "2006-01-02"
+
+	since, err := time.Parse(layout, date)
+	if err != nil {
+		panic(err)
+	}
+
+	variables := map[string]interface{}{
+		"login": githubv4.String(user),
+		"since": githubv4.DateTime{since},
+	}
+	err = client.Query(context.Background(), &userQuery, variables)
+	if err != nil {
+		panic(err)
+	}
+
+	return int(userQuery.User.ContributionsCollection.TotalCommitContributions)
+}

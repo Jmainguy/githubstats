@@ -96,7 +96,10 @@ func main() {
 		}
 	}
 
+	commits := commitsByUser(client, *userPtr, *sincePtr)
+
 	fmt.Printf("Total PR's Opened %d\n", opened)
 	fmt.Printf("Total PR's Merged %d\n", merged)
 	fmt.Printf("Total Reviews %d\n", reviewsIDid)
+	fmt.Printf("Commits: %d\n", commits)
 }
