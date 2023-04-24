@@ -3,7 +3,7 @@ module github.com/jmainguy/githubstats
 go 1.17
 
 require (
-	github.com/shurcooL/githubv4 v0.0.0-20230305132112-efb623903184
+	github.com/shurcooL/githubv4 v0.0.0-20230424031643-6cea62ecd5a9
 	golang.org/x/oauth2 v0.7.0
 )
 
