@@ -4,12 +4,6 @@ import (
 	"github.com/shurcooL/githubv4"
 )
 
-type repo struct {
-	name          string
-	owner         string
-	nameWithOwner string
-}
-
 type pullRequest struct {
 	author    string
 	url       githubv4.URI
