@@ -43,11 +43,10 @@ func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequest
 	if err != nil {
 		panic(err)
 	}
-
 	variables := map[string]interface{}{
 		"login":  githubv4.String(user),
 		"cursor": (*githubv4.String)(nil), // Null after argument to get first page.
-		"since":  githubv4.DateTime{since},
+		"since":  githubv4.DateTime{Time: since},
 	}
 	for {
 		err := client.Query(context.Background(), &userQuery, variables)
@@ -109,7 +108,7 @@ func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullR
 	variables := map[string]interface{}{
 		"login":  githubv4.String(user),
 		"cursor": (*githubv4.String)(nil), // Null after argument to get first page.
-		"since":  githubv4.DateTime{since},
+		"since":  githubv4.DateTime{Time: since},
 	}
 	for {
 		err := client.Query(context.Background(), &userQuery, variables)
@@ -150,7 +149,7 @@ func commitsByUser(client *githubv4.Client, user, date string) (commits int) {
 
 	variables := map[string]interface{}{
 		"login": githubv4.String(user),
-		"since": githubv4.DateTime{since},
+		"since": githubv4.DateTime{Time: since},
 	}
 	err = client.Query(context.Background(), &userQuery, variables)
 	if err != nil {
