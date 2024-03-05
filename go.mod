@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/shurcooL/githubv4 v0.0.0-20240120211514-18a1ae0e79dc
-	golang.org/x/oauth2 v0.17.0
+	golang.org/x/oauth2 v0.18.0
 )
 
 require (
