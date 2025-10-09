@@ -7,7 +7,7 @@ import (
 	"github.com/shurcooL/githubv4"
 )
 
-func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequests []pullRequest) {
+func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequests []pullRequest, repos []string) {
 	var userQuery struct {
 		User struct {
 			ContributionsCollection struct {
@@ -25,6 +25,7 @@ func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequest
 									Owner struct {
 										Login githubv4.String
 									}
+									Name githubv4.String
 								}
 							}
 						}
@@ -61,6 +62,9 @@ func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequest
 			pr.createdAt = edge.Node.PullRequest.CreatedAt
 			pr.url = edge.Node.PullRequest.URL
 			pr.owner = edge.Node.PullRequest.Repository.Owner.Login
+			// collect repo full name owner/name
+			repoFull := string(edge.Node.PullRequest.Repository.Owner.Login) + "/" + string(edge.Node.PullRequest.Repository.Name)
+			repos = append(repos, repoFull)
 			pullRequests = append(pullRequests, pr)
 		}
 		if !userQuery.User.ContributionsCollection.PullRequestContributions.PageInfo.HasNextPage {
@@ -69,10 +73,11 @@ func pullRequestsByUser(client *githubv4.Client, user, date string) (pullRequest
 			variables["cursor"] = githubv4.NewString(userQuery.User.ContributionsCollection.PullRequestContributions.PageInfo.EndCursor)
 		}
 	}
-	return pullRequests
+	// return collected repos (may contain duplicates; caller dedups)
+	return pullRequests, repos
 }
 
-func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullRequestReviews []pullRequestReview) {
+func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullRequestReviews []pullRequestReview, repos []string) {
 	var userQuery struct {
 		User struct {
 			ContributionsCollection struct {
@@ -87,6 +92,7 @@ func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullR
 								Owner struct {
 									Login githubv4.String
 								}
+								Name githubv4.String
 							}
 						}
 					}
@@ -121,6 +127,9 @@ func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullR
 			prr.createdAt = edge.Node.PullRequestReview.CreatedAt
 			prr.url = edge.Node.PullRequestReview.URL
 			prr.owner = edge.Node.Repository.Owner.Login
+			// collect repo full name
+			repoFull := string(edge.Node.Repository.Owner.Login) + "/" + string(edge.Node.Repository.Name)
+			repos = append(repos, repoFull)
 			pullRequestReviews = append(pullRequestReviews, prr)
 		}
 		if !userQuery.User.ContributionsCollection.PullRequestReviewContributions.PageInfo.HasNextPage {
@@ -129,14 +138,25 @@ func pullRequestReviewsByUser(client *githubv4.Client, user, date string) (pullR
 			variables["cursor"] = githubv4.NewString(userQuery.User.ContributionsCollection.PullRequestReviewContributions.PageInfo.EndCursor)
 		}
 	}
-	return pullRequestReviews
+	return pullRequestReviews, repos
 }
 
-func commitsByUser(client *githubv4.Client, user, date string) (commits int) {
+func commitsByUser(client *githubv4.Client, user, date string) (commits int, repos []string) {
 	var userQuery struct {
 		User struct {
 			ContributionsCollection struct {
-				TotalCommitContributions githubv4.Int
+				TotalCommitContributions        githubv4.Int
+				CommitContributionsByRepository []struct {
+					Repository struct {
+						Owner struct {
+							Login githubv4.String
+						}
+						Name githubv4.String
+					}
+					Contributions struct {
+						TotalCount githubv4.Int
+					}
+				} `graphql:"commitContributionsByRepository(maxRepositories: 100)"`
 			} `graphql:"contributionsCollection(from: $since)"`
 		} `graphql:"user(login: $login)"`
 	}
@@ -155,6 +175,13 @@ func commitsByUser(client *githubv4.Client, user, date string) (commits int) {
 	if err != nil {
 		panic(err)
 	}
-
-	return int(userQuery.User.ContributionsCollection.TotalCommitContributions)
+	// collect commits total and per-repo list
+	total := int(userQuery.User.ContributionsCollection.TotalCommitContributions)
+	for _, entry := range userQuery.User.ContributionsCollection.CommitContributionsByRepository {
+		repoFull := string(entry.Repository.Owner.Login) + "/" + string(entry.Repository.Name)
+		repos = append(repos, repoFull)
+		// contributions count is available in entry.Contributions.TotalCount if needed
+		_ = entry.Contributions.TotalCount
+	}
+	return total, repos
 }

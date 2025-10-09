@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -32,14 +33,19 @@ func main() {
 
 	client := githubv4.NewClient(httpClient)
 	userPtr := flag.String("user", "Jmainguy", "Github Username")
-	orgsPtr := flag.String("orgs", "standouthost", "a list of orgs separated by commas")
+	orgsPtr := flag.String("orgs", "", "a list of orgs separated by commas (optional)")
 	sincePtr := flag.String("since", "2022-01-01", "yyyy-mm-dd date to check for stats since")
 	verbosePtr := flag.Bool("verbose", false, "print verbose information about each contribution or not")
 
 	flag.Parse()
 
 	const layout = "2006-01-02"
-	orgs := strings.Split(*orgsPtr, ",")
+	// If --orgs is empty, don't filter by orgs.
+	filterOrgs := *orgsPtr != ""
+	var orgs []string
+	if filterOrgs {
+		orgs = strings.Split(*orgsPtr, ",")
+	}
 	opened := 0
 	merged := 0
 	reviewsIDid := 0
@@ -50,13 +56,14 @@ func main() {
 	}
 	// End Setup
 
-	prs := pullRequestsByUser(client, *userPtr, *sincePtr)
+	prs, prRepos := pullRequestsByUser(client, *userPtr, *sincePtr)
 	if *verbosePtr {
 		fmt.Println("Pull Requests:")
 	}
 	for _, pr := range prs {
 		var print bool
-		if contains(orgs, string(pr.owner)) {
+		// If no org filter is set, accept all; otherwise check the org list.
+		if !filterOrgs || contains(orgs, string(pr.owner)) {
 			if pr.merged {
 				print = true
 				merged++
@@ -81,9 +88,10 @@ func main() {
 		fmt.Println("Pull Request Reviews")
 	}
 
-	prrs := pullRequestReviewsByUser(client, *userPtr, *sincePtr)
+	prrs, prReviewRepos := pullRequestReviewsByUser(client, *userPtr, *sincePtr)
 	for _, prr := range prrs {
-		if contains(orgs, string(prr.owner)) {
+		// If no org filter is set, accept all; otherwise check the org list.
+		if !filterOrgs || contains(orgs, string(prr.owner)) {
 			if prr.createdAt.After(startDate) {
 				reviewsIDid++
 				if *verbosePtr {
@@ -91,15 +99,62 @@ func main() {
 					fmt.Println("  URL:", prr.url)
 					fmt.Println("")
 				}
-
 			}
 		}
 	}
 
-	commits := commitsByUser(client, *userPtr, *sincePtr)
+	commits, commitRepos := commitsByUser(client, *userPtr, *sincePtr)
 
 	fmt.Printf("Total PR's Opened %d\n", opened)
 	fmt.Printf("Total PR's Merged %d\n", merged)
 	fmt.Printf("Total Reviews %d\n", reviewsIDid)
 	fmt.Printf("Commits: %d\n", commits)
+
+	// Build set of repos worked on from PRs, reviews, commits
+	orgRepos := make(map[string]map[string]bool)
+	addRepo := func(full string) {
+		parts := strings.SplitN(full, "/", 2)
+		if len(parts) != 2 {
+			return
+		}
+		org := parts[0]
+		repo := parts[1]
+		if _, ok := orgRepos[org]; !ok {
+			orgRepos[org] = make(map[string]bool)
+		}
+		orgRepos[org][repo] = true
+	}
+	for _, r := range prRepos {
+		addRepo(r)
+	}
+	for _, r := range prReviewRepos {
+		addRepo(r)
+	}
+	for _, r := range commitRepos {
+		addRepo(r)
+	}
+
+	// Print sorted by org, then repo
+	if len(orgRepos) > 0 {
+		fmt.Println("")
+		fmt.Println("Repositories worked on:")
+		// sort orgs
+		orgList := make([]string, 0, len(orgRepos))
+		for o := range orgRepos {
+			orgList = append(orgList, o)
+		}
+		sort.Strings(orgList)
+		for _, org := range orgList {
+			repoMap := orgRepos[org]
+			repos := make([]string, 0, len(repoMap))
+			for r := range repoMap {
+				repos = append(repos, r)
+			}
+			sort.Strings(repos)
+			fmt.Printf("%s:\n", org)
+			for _, r := range repos {
+				fmt.Printf("  - %s/%s\n", org, r)
+			}
+		}
+	}
 }

@@ -6,19 +6,27 @@
 A golang application to return stats from github via their graphql endpoint
 
 ## Requirements
-This tool requires a github personal access token to work, the token needs to repo permissions.
+This tool uses the GitHub GraphQL API. You should set a personal access token in the GITHUB_TOKEN environment variable before running the tool.
 
-You need to export the token before running the tool, it has to be named GITHUB_TOKEN
-
-```/bin/bash
-export GITHUB_TOKEN=ghp_sdasdasdewsadsdad2asdsadasdas
+export example:
+```bash
+export GITHUB_TOKEN=ghp_yourtokenhere
 ```
 
+Token permissions (scopes)
+- Public data only: a token is not strictly required, but providing a token increases rate limits. No special scopes required for public-only queries.
+- Private repositories or private contributions: grant the `repo` scope on the token.
+- (Optional) If you need to access organization-only resources beyond your public info, you can also add `read:org`.
+
+Minimum recommendation:
+- For typical use across public projects: a token with no additional scopes (or none) is fine.
+- To include private repo stats: `repo` scope.
+
 ## Usage
-```/bin/bash
+```bash
 Usage of githubstats:
   -orgs string
-    	a list of orgs separated by commas (default "standouthost")
+    	a list of orgs separated by commas (optional; if omitted, results from all orgs are included)
   -since string
     	yyyy-mm-dd date to check for stats since (default "2022-01-01")
   -user string
@@ -27,28 +35,27 @@ Usage of githubstats:
     	print verbose information about each contribution or not
 ```
 
+## What's changed
+- --orgs is now optional. If you do not pass --orgs, the tool will include contributions from all organizations found in the results.
+- At the end of the report the tool now prints a deduplicated list of repositories the user has worked on (from PRs, reviews, and commits), grouped and sorted by organization.
+- The commits query now collects repositories the user committed to (up to the GraphQL limits).
+
 ## Example
-```/bin/bash
-[jmainguy@jmainguy githubstats]$ export GITHUB_TOKEN=ghp_sdasdasdewsadsdad2asdsadasdas
-[jmainguy@jmainguy githubstats]$ githubstats 
+```bash
+export GITHUB_TOKEN=ghp_yourtokenhere
+githubstats --user yourusername --since 2023-01-01
 Total PR's Opened 7
 Total PR's Merged 5
 Total Reviews 3
+Commits: 42
+
+Repositories worked on:
+acme:
+  - acme/api
+  - acme/ui
+standouthost:
+  - standouthost/infra
 ```
 
 ## PreBuilt Binaries
 Grab Binaries from [The Releases Page](https://github.com/Jmainguy/githubstats/releases)
-
-## Install
-
-### Homebrew
-
-```/bin/bash
-brew install Jmainguy/tap/githubstats
-```
-
-## Build
-```/bin/bash
-export GO111MODULE=on
-go build
-```
