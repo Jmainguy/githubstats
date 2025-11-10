@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.0](https://github.com/Jmainguy/githubstats/compare/v0.0.4...v1.0.0) (2025-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* release 1.0
+
+### Features
+
+* release 1.0 ([6167be6](https://github.com/Jmainguy/githubstats/commit/6167be64843beaa94a1c285df509309124e2b19f))
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/oauth2 to v0.33.0 ([a568745](https://github.com/Jmainguy/githubstats/commit/a56874507468f0fd3471774a6e4a82590d576bb8))
+* **deps:** update module golang.org/x/oauth2 to v0.33.0 ([0dd74d6](https://github.com/Jmainguy/githubstats/commit/0dd74d6f66319bc1ffe3a89ae32f0c4f6f8e0249))
+
 ## [0.0.4](https://github.com/Jmainguy/githubstats/compare/v0.0.3...v0.0.4) (2025-09-08)
 
 
