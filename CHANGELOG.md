@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1](https://github.com/Jmainguy/githubstats/compare/v1.0.0...v1.0.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* **deps:** update github.com/shurcool/githubv4 digest to 2402fdf ([294d20c](https://github.com/Jmainguy/githubstats/commit/294d20c787d71f339f16be08fbb1a5a30b1c8cc7))
+* **deps:** update github.com/shurcool/githubv4 digest to 2402fdf ([6c5b943](https://github.com/Jmainguy/githubstats/commit/6c5b943dd149ee80e28a707b2fd44d1441b182c0))
+* **deps:** update module golang.org/x/oauth2 to v0.36.0 ([fe5c644](https://github.com/Jmainguy/githubstats/commit/fe5c644b57361b842b610961e633b2ca36bc3166))
+* **deps:** update module golang.org/x/oauth2 to v0.36.0 ([e18a50b](https://github.com/Jmainguy/githubstats/commit/e18a50b38e7e7fbd2583f93be03875eef6b93b14))
+
 ## [1.0.0](https://github.com/Jmainguy/githubstats/compare/v0.0.4...v1.0.0) (2025-11-10)
 
 
