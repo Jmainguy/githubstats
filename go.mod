@@ -2,7 +2,7 @@ module github.com/jmainguy/githubstats
 
 go 1.25.0
 
-toolchain go1.26.1
+toolchain go1.26.2
 
 require (
 	github.com/shurcooL/githubv4 v0.0.0-20260209031235-2402fdf4a9ed
