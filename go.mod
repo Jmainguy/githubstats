@@ -9,4 +9,4 @@ require (
 	golang.org/x/oauth2 v0.36.0
 )
 
-require github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466 // indirect
+require github.com/shurcooL/graphql v0.0.0-20240915155400-7ee5256398cf // indirect
