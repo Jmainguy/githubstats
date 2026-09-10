@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/Jmainguy/githubstats/compare/v1.0.1...v1.0.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/oauth2 to v0.37.0 ([#58](https://github.com/Jmainguy/githubstats/issues/58)) ([90d2efc](https://github.com/Jmainguy/githubstats/commit/90d2efcdd9814c17971f8282f7cbfa068a32853e))
+
 ## [1.0.1](https://github.com/Jmainguy/githubstats/compare/v1.0.0...v1.0.1) (2026-03-30)
 
 
